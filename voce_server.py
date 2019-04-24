@@ -101,7 +101,11 @@ def delete_file():
 	return "Deleted"
 
 def separate(source_file, method):
+	print("Source Separation.\nFile: %s. Method: %s" % (source_file, method))
 	separator.set_file(source_file)
+	f_name, f_ext = source_file.rsplit(".", 1)
+	f_name = f_name.rsplit("\\", 1)[1]
+	separator.plot(0, True, f_name, os.path.join(app.config['OUTPUT_FOLDER'], f_name))
 	if method == "repet_sim":
 		return separator.repet_sim()
 	elif method == "hpss":
@@ -121,7 +125,14 @@ def do_separation():
 	fg_name = f_name + "-" + method + "-fg." + f_ext
 	background.write_audio_to_file(os.path.join(app.config['OUTPUT_FOLDER'], bg_name))
 	foreground.write_audio_to_file(os.path.join(app.config['OUTPUT_FOLDER'], fg_name))
-	return jsonify(input_file=filename, method=method, bg_file=bg_name, fg_file=fg_name)
+	# create plots
+	print("plotting")
+	bg_img_name = f_name + "-" + method + "-bg"
+	fg_img_name = f_name + "-" + method + "-fg"
+	foreground.plot_time_domain(0, True, fg_name, os.path.join(app.config['OUTPUT_FOLDER'], fg_img_name))
+	background.plot_time_domain(0, True, bg_name, os.path.join(app.config['OUTPUT_FOLDER'], bg_img_name))
+	print("completed")
+	return jsonify(input_file=filename, method=method, bg_file=bg_name, fg_file=fg_name, bg_img=bg_img_name+".png", fg_img=fg_img_name+".png", original_img=f_name+".png")
 
 if __name__ == "__main__":
 	print("Initialising SpeechInterface... starting server")

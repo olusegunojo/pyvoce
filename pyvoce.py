@@ -149,6 +149,9 @@ class SourceSeparation:
 		nmf_mfcc = nussl.NMF_MFCC(audio_data, num_sources=_num_sources)
 		masks = nmf_mfcc.run()
 		return self.output_results(nmf_mfcc.make_audio_signals(), "nmf_mfcc")
+		
+	def plot(self, channel=None, x_label_time=True, title=None, file_path_name=None):
+		self.audio_data.plot_time_domain(channel, x_label_time, title, file_path_name)
 
 	def another_method(self):
 		pass

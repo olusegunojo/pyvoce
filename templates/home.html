@@ -144,15 +144,21 @@
 		result +="<div class='col-sm-6'> \
 				<input type='radio' name='output_file' id='output-file' value=''>" + data.bg_file;
 		result += "</div> \
-			<div class='col-sm-2'> \
-				<a class='btn btn-primary btn-sm' href='{{ url_for('get_file', filetype='output', filename='') }}" + data.bg_file + "'><i class='fa fa-download'></i>Download</a> \
+			<div class='col-sm-4'> \
+				<a class='btn btn-primary btn-sm' href='{{ url_for('get_file', filetype='output', filename='') }}" + data.bg_file + "'><i class='fa fa-download'></i>Download</a><a class='btn btn-success btn-sm' href='{{ url_for('get_file', filetype='output', filename='') }}" + data.bg_img + "'><i class='fa fa-download'></i>Download Plot</a> \
 			</div>";
 
 		result +="<div class='col-sm-6'> \
 				<input type='radio' name='output_file' id='output-file' value=''>" + data.fg_file;
 		result += "</div> \
-			<div class='col-sm-2'> \
-				<a class='btn btn-primary btn-sm' href='{{ url_for('get_file', filetype='output', filename='') }}" + data.fg_file + "'><i class='fa fa-download'></i>Download</a> \
+			<div class='col-sm-4'> \
+				<a class='btn btn-primary btn-sm' href='{{ url_for('get_file', filetype='output', filename='') }}" + data.fg_file + "'><i class='fa fa-download'></i>Download</a><a class='btn btn-success btn-sm' href='{{ url_for('get_file', filetype='output', filename='') }}" + data.fg_img + "'><i class='fa fa-download'></i>Download Plot</a> \
+			</div>";
+		result +="<div class='col-sm-6'> \
+				<input type='radio' name='output_file' id='output-file' value=''>" + "Original File: " + data.input_file;
+		result += "</div> \
+			<div class='col-sm-4'> \
+				<a class='btn btn-primary btn-sm' href='{{ url_for('get_file', filetype='input', filename='') }}" + data.input_file + "'><i class='fa fa-download'></i>Download</a><a class='btn btn-success btn-sm' href='{{ url_for('get_file', filetype='output', filename='') }}" + data.original_img + "'><i class='fa fa-download'></i>Download Original Plot</a> \
 			</div>";
 		result += "</div>";
 
