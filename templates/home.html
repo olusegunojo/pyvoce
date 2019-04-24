@@ -78,33 +78,33 @@
 								</div>
 							</div>
 						</form>
-				</div>
-				<div>
-					<h3>Separation Methods</h3>
-					<div class="row">
-						<!-- separation_methods should contain method objects: with number_of_sources attribute: 'two' or 'multiple' -->
-						{% for each_method in separation_methods %}
-							<div class="col-sm-2">
-								<input type="radio" name="separation_method" value="{{ each_method }}">{{ each_method }}
-							</div>
-						{% endfor %}
 					</div>
-				</div>
-				<div>
-					<a href="#" class="btn btn-success" id="do-separation">Do Separation</a>
-				</div>
-				<div id="output-file-list">
-					<!-- {% for each_file in output_files %}
-						<div class="row" id="output-file-group-{{ forloop.counter }}">
-							<input type="radio" name="input_file" id="input-file-{{ forloop.counter }}" value="{{ each_file.filename }}">{{ each_file.filename }}
-							<a href="#" id="delete-file-{{ forloop.counter }}">Delete File</a>
-							<a href="{{ url_for('get_file', filetype='input', filename=each_file.filename) }}">Download</a>
+					<div>
+						<h3>Separation Methods</h3>
+						<div class="row">
+							<!-- separation_methods should contain method objects: with number_of_sources attribute: 'two' or 'multiple' -->
+							{% for each_method in separation_methods %}
+								<div class="col-sm-2">
+									<input type="radio" name="separation_method" value="{{ each_method }}">{{ each_method }}
+								</div>
+							{% endfor %}
 						</div>
-					{% endfor %} -->
-				</div>
-				<div class="container">
-					<div><a href="{{ url_for('files') }}">All Files</a></div>
-				</div>
+					</div>
+					<div>
+						<a href="#" class="btn btn-success" id="do-separation">Do Separation</a>
+					</div>
+					<div id="output-file-list">
+						<!-- {% for each_file in output_files %}
+							<div class="row" id="output-file-group-{{ forloop.counter }}">
+								<input type="radio" name="input_file" id="input-file-{{ forloop.counter }}" value="{{ each_file.filename }}">{{ each_file.filename }}
+								<a href="#" id="delete-file-{{ forloop.counter }}">Delete File</a>
+								<a href="{{ url_for('get_file', filetype='input', filename=each_file.filename) }}">Download</a>
+							</div>
+						{% endfor %} -->
+					</div>
+					<div class="container">
+						<div><a href="{{ url_for('files') }}">All Files</a></div>
+					</div>
 			</div>
 		</div>
 	</div>
@@ -120,6 +120,7 @@
 	$('#input_file[value=other]').focus(function() {
 		$('#uploader').fadeIn();
 	}); // end select "other" input_file
+	
 	$('input[id^=input-file]:not([value=other])').focus(function() {
 		$('#uploader').fadeOut();
 	}); // end select "other" input_file
@@ -181,7 +182,6 @@
 	}
 
 	function do_separation(filename, method) {
-		var a = "asdf";
 		$.post(
 			'{{ url_for("do_separation") }}', 
 			{filename: filename, method: method}, 
