@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}"></style>
+		<title>Files
+		</title>
+	</head>
+
+	<body>
+		<div class="container">
+			<div>
+				<h2>Input Files</h2>
+				{% for each_file in input_files %}
+					<div class="row" id="input-file-group-{{ loop.index }}">
+						<div class="col-sm-6">
+							<input type="radio" name="input_file" id="input-file-{{ loop.index }}" value="{{ each_file }}">{{ each_file }}
+						</div>
+						<div class="col-sm-2">
+							<a class="btn btn-danger btn-sm" href="#" id="delete-file-{{ loop.index }}"><i class="fa fa-trash"></i>Delete</a>
+							<a class="btn btn-primary btn-sm" href="{{ url_for('get_file', filetype='input', filename=each_file) }}"><i class="fa fa-download"></i>Download</a>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+
+			<div>
+				<h2>Output Files</h2>
+				{% for each_file in output_files %}
+					<div class="row" id="input-file-group-{{ loop.index }}">
+						<div class="col-sm-6">
+							<input type="radio" name="input_file" id="input-file-{{ loop.index }}" value="{{ each_file }}">{{ each_file }}
+						</div>
+						<div class="col-sm-2">
+							<a class="btn btn-danger btn-sm" href="#" id="delete-file-{{ loop.index }}"><i class="fa fa-trash"></i>Delete</a>
+							<a class="btn btn-primary btn-sm" href="{{ url_for('get_file', filetype='output', filename=each_file) }}"><i class="fa fa-download"></i>Download</a>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+			<div><a href="{{ url_for('index') }}">Home</a></div>
+			<div><a href="{{ url_for('files') }}">All Files</a></div>
+		</div>
+	</body>
+</html>

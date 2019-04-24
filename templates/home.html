@@ -1,0 +1,187 @@
+<html>
+<head>
+	<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}"></style>
+	<title>pyvoce test webinterface</title>
+</head>
+<body>
+	<div class="container">
+		<div>
+			<h1>PyVoce Test</h1>
+		</div>
+		<div>
+			{% for msg in get_flashed_messages() %}
+			<div>{{ msg }}</div>
+			{% endfor %}
+		</div>
+		<div id="synthesis-test">
+			<div>
+				<h2>Synthesis Test</h2>
+			</div>
+			<div>
+				<div class="form-group row">
+					<div class="col-sm-8">
+						<input type="text" class="form-control rounded" name="text" id="text" placeholder="Enter text to synthesize">
+						<small class="form-text text-muted">Enter text here and click the "Read" button to hear it</small>
+					</div>
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-primary rounded" onclick="do_read();">Read</button>
+					</div>
+				</div>
+				<div><span id="result"></span></div>
+			</div>
+		</div>
+
+		<div id="separation-test">
+			<div>
+				<h2>Separation Test</h2>
+			</div>
+			<div>
+					<!--
+						Then display list of files uploaded with radio buttons.
+						display list of separation methods with radio buttons
+						
+						Select file, select separation method
+						
+						Submit calls appropriate method and loads response (a list of output file names) into #result
+						as list of links to download corresponding file
+					-->
+					<div>
+						<h3>Input Files</h3>
+						<div id="input_file_list">
+							{% set i=0 %}
+							{% for each_file in input_files %}
+								<div class="row" id="input-file-group-{{ loop.index }}">
+									<div class="col-sm-6">
+										<input type="radio" name="input_file" id="input-file-{{ loop.index }}" value="{{ each_file }}">{{ each_file }}
+									</div>
+									<div class="col-sm-2">
+										<a class="btn btn-danger btn-sm" href="#" id="delete-file-{{ loop.index }}"><i class="fa fa-trash"></i>Delete</a>
+										<a class="btn btn-primary btn-sm" href="{{ url_for('get_file', filetype='input', filename=each_file) }}"><i class="fa fa-download"></i>Download</a>
+									</div>
+								</div>
+								{% set i=i+1 %}
+							{% endfor %}
+							<div class="row" id="input-file-group-none">
+								<div class="col-sm-6">
+									<input type="radio" name="input_file" id="input_file" value="other">Upload new
+								</div>
+							</div>
+						</div>
+						<form id="uploader" method="post" enctype="multipart/form-data" action="/upload/">
+							<div class="form-group row">
+								<div class="col-sm-8">
+									<input type="file" class="form-control rounded" name="file_upload" id="file-uploader">
+									<small class="form-text text-muted">Upload input audio source file</small>
+								</div>
+								<div class="col-sm-2">
+									<input type="submit" class="btn btn-primary rounded" onclick="upload_audio_file();" value="Upload file">
+								</div>
+							</div>
+						</form>
+				</div>
+				<div>
+					<h3>Separation Methods</h3>
+					<div class="row">
+						<!-- separation_methods should contain method objects: with number_of_sources attribute: 'two' or 'multiple' -->
+						{% for each_method in separation_methods %}
+							<div class="col-sm-2">
+								<input type="radio" name="separation_method" value="{{ each_method }}">{{ each_method }}
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+				<div>
+					<a href="#" class="btn btn-success" id="do-separation">Do Separation</a>
+				</div>
+				<div id="output-file-list">
+					<!-- {% for each_file in output_files %}
+						<div class="row" id="output-file-group-{{ forloop.counter }}">
+							<input type="radio" name="input_file" id="input-file-{{ forloop.counter }}" value="{{ each_file.filename }}">{{ each_file.filename }}
+							<a href="#" id="delete-file-{{ forloop.counter }}">Delete File</a>
+							<a href="{{ url_for('get_file', filetype='input', filename=each_file.filename) }}">Download</a>
+						</div>
+					{% endfor %} -->
+				</div>
+				<div class="container">
+					<div><a href="{{ url_for('files') }}">All Files</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery-1.9.1.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='bootstrap.js') }}"></script>
+<script type="text/javascript">
+
+	$SCRIPT_ROOT = '{{ request.script_root|tojson|safe }}';
+
+	$('#uploader').hide();
+	
+	$('#input_file[value=other]').focus(function() {
+		$('#uploader').fadeIn();
+	}); // end select "other" input_file
+	$('input[id^=input-file]:not([value=other])').focus(function() {
+		$('#uploader').fadeOut();
+	}); // end select "other" input_file
+
+	$('a[id^=delete-file-]').click(function() {
+		var id = $(this).attr('id').split('-')[2];
+		var filename = $('#input-file-'+id).attr('value');
+		delete_file('input', filename);
+		$('#input-file-group-'+id).remove();
+	})
+
+	$('a[id=do-separation]').click(function() {
+		var filename = $('input[name=input_file]:checked').val();
+		var method = $('input[name=separation_method]:checked').val();
+		do_separation(filename, method);
+	})
+
+	function load_outputs(data) {
+		var result = "<div class='row' id='output-file-group'>";
+		result += "<h3>Results</h3>"
+		result += "<p><strong>Input file</strong>: " + data.input_file + " | <strong>Separation method</strong>: " + data.method + "</p>";
+		result +="<div class='col-sm-6'> \
+				<input type='radio' name='output_file' id='output-file' value=''>" + data.bg_file;
+		result += "</div> \
+			<div class='col-sm-2'> \
+				<a class='btn btn-primary btn-sm' href='{{ url_for('get_file', filetype='output', filename='') }}" + data.bg_file + "'><i class='fa fa-download'></i>Download</a> \
+			</div>";
+
+		result +="<div class='col-sm-6'> \
+				<input type='radio' name='output_file' id='output-file' value=''>" + data.fg_file;
+		result += "</div> \
+			<div class='col-sm-2'> \
+				<a class='btn btn-primary btn-sm' href='{{ url_for('get_file', filetype='output', filename='') }}" + data.fg_file + "'><i class='fa fa-download'></i>Download</a> \
+			</div>";
+		result += "</div>";
+
+		$('#output-file-list').html(result);
+	}
+
+	function read_text(text) {
+		$('#result').load('synthesize/'+text)
+		// $('#result').load('{{ url_for('synthesize', text=text) }}');
+	}
+
+	function do_read() {
+		var text = encodeURIComponent($('#text').val());
+		// Console.log(text);
+		read_text(text);
+	}
+
+	function delete_file(filetype, filename) {
+		$.post('{{ url_for("delete_file") }}', {filename: filename, filetype: filetype});
+	}
+
+	function do_separation(filename, method) {
+		var a = "asdf";
+		$.post(
+			'{{ url_for("do_separation") }}', 
+			{filename: filename, method: method}, 
+			load_outputs, 
+			'json'
+		);
+	}
+</script>
+</html>
